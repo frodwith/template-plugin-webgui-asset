@@ -1,0 +1,71 @@
+NAME
+    Template::Plugin::WebGUI::Asset
+
+DESCRIPTION
+    A plugin for including/processing/inserting the output of a WebGUI
+    asset's view method.
+
+SYNOPSIS
+        [% USE my_asset = WebGUI::Asset(asset => an_asset_reference) %]
+
+        [%# or... %]
+
+        [% USE WebGUI::Asset(
+               name    => 'my_asset', 
+               session => a_session_reference,
+               url     => 'an_asset_url', # or id => 'an_asset_id'
+           ) %]
+    
+        [%# or, in mid webgui request, omit session %]
+
+        [% USE my_asset = WebGUI::Asset(url => 'an_asset_url') %]
+
+        [%# Then... %]
+
+        [% my_asset.include # just like INCLUDE afilename %]
+        [% my_asset.process # just like PROCESS afilename %] 
+        [% my_asset.insert  # just like INSERT  afilename %]
+
+FAIR WARNING
+    The typical use case for this module is being called by WebGUI's
+    template engine, which doesn't give us any help in the form of an asset
+    or session reference. We therefore have to walk the stack and find the
+    session it's calling us with. That's a nasty hack, so be warned. It can
+    be solved in the future if need be by writing a new template processor
+    (or modifying the old one) that passes us a session reference.
+
+METHODS
+  new (context, params)
+    When you call this plugin, pass it either an asset param (asset =>
+    $asset) or a session and a id or url (session => $session, id =>
+    $assetId) or (session => $session, url => $url). If it has to, it will
+    walk up the call stack looking for a session to use. That's probably
+    what will end up happening until the WebGUI template api changes, but if
+    you can avoid it, you should.
+
+    You can also pass a name to bind the variable to (e.g. [% USE ... name
+    => foo %] [% foo.process %]), or do [% USE foo = ... %], it's a matter
+    of style.
+
+  process
+    Processes the output of the assets's view() method in the current
+    template context. See the PROCESS directive in TT. You can optionally
+    provide named arguments (as a hash or in the key=value syntax) just like
+    you can with the PROCESS directive.
+
+  include
+    Includes the output of the asset's view() method in a new template
+    context. See the INCLUDE directive in TT. You can optionally provide
+    named arguments (as a hash or in the key=value syntax) just like you can
+    with the INCLUDE directive.
+
+  insert
+    Outputs the contents of the asset's view() method without processing it
+    at all. See the INSERT directive in TT.
+
+AUTHOR
+    Paul Driver, "<frodwith at cpan.org>"
+
+LICENSE
+    This module is licensed under the same terms as Perl itself.
+
