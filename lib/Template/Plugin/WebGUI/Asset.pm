@@ -121,6 +121,8 @@ sub new {
 
     die 'No way to get an asset' unless $asset;
 
+    $asset->toggleToolbar;
+    $asset->prepareView;
     $self->{raw} = $asset->view;
 
     if (my $name = $params->{name}) {
