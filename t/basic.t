@@ -3,11 +3,10 @@ use Test::More tests => 1;
 use Template;
 
 my $snippet = Test::MockObject->new;
-$snippet->mock(
-    view => sub {
-        return  '[% 2 + 2 %]';
-    }
-);
+my ($prep, $togg);
+$snippet->mock( prepareView => sub { $prep = 1 } )
+    ->mock( toggleToolbar   => sub { $togg = 1 } )
+    ->mock( view            => sub { $prep && $togg && '[% 2 + 2 %]' } );
 
 my $template = <<'END_TT';
 [% FILTER collapse %]

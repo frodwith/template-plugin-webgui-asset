@@ -3,6 +3,7 @@ use strict;
 
 use Test::More tests => 1;
 use Template::Plugin::WebGUI::Asset;
+use Test::MockObject;
 
 package WebGUI::Session;
 no warnings 'redefine';
@@ -16,11 +17,14 @@ no warnings 'redefine';
 
 sub newByUrl {
     my ($class, $session) = @_;
-    bless { session => $session }, $class;
-}
+    my $self = Test::MockObject->new;
+    my ($prepared, $toggled);
 
-sub view {
-    return shift->{session};
+    $self->mock( prepareView   => sub { $prepared = 1 } )
+         ->mock( toggleToolbar => sub { $toggled = 1 } )
+         ->mock( view          => sub { $prepared && $toggled && $session });
+
+    return $self;
 }
 
 package main;
